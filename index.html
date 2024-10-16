@@ -45,18 +45,29 @@
             const exerciseId = urlParams.get('exercise');
             const path = window.location.pathname.split('/').pop();
             
-            const deepLink = `${appScheme}/${path}?exercise_id=${exerciseId}`;
+            let deepLink = `${appScheme}`;
 
-            
-            if (confirm('앱을 실행하시겠습니까?')) {
+            // path가 1, 2, 3, 4 중 하나인 경우에만 처리
+            if (['1', '2', '3', '4'].includes(path)) {
+                deepLink += `/${path}`;
                 
+                // 경로가 1이고 exercise 파라미터가 있는 경우에만 exercise_id를 추가
+                if (path === '1' && exerciseId) {
+                    deepLink += `?exercise=${exerciseId}`;
+                }
+            }
+
+            // 사용자에게 확인 메시지 표시
+            if (confirm('앱을 실행하시겠습니까?')) {
+                // 딥링크로 앱 열기 시도
                 window.location.href = deepLink;
 
+                // 일정 시간 후에 앱이 열리지 않으면 스토어로 이동
                 setTimeout(() => {
                     if (!document.hidden) {
                         window.location.href = appStoreURL;
                     }
-                }, 1300);
+                }, 2000); // 2초 후 확인
             }
         }
 
