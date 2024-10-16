@@ -41,34 +41,48 @@
         const appStoreURL = 'https://play.google.com/store/apps/details?id=com.tangoplus.tangoq';
 
         function handleDeepLink() {
+            console.log("전체 URL:", window.location.href); // 전체 URL 출력
+            console.log("pathname:", window.location.pathname); // pathname 출력
+
             const urlParams = new URLSearchParams(window.location.search);
             const exercise = urlParams.get('exercise');
-            const path = window.location.pathname.split('/').pop();
-            console.log("가져온경로:", path);  // 디버깅을 위한 로그 추가
+
+            // 경로 세그먼트 파싱 (쿼리 파라미터 방식으로 변경 가능)
+            const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
+            const path = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : '';
+
+            // 또는, 쿼리 파라미터 방식 사용 시:
+            // const path = urlParams.get('path') || '';
+
+            console.log("가져온 경로 (path):", path); // path 변수 출력
+
             let deepLink = `${appScheme}`;
 
             // path가 1, 2, 3, 4 중 하나인 경우에만 처리
             if (['1', '2', '3', '4'].includes(path)) {
                 deepLink += `/${path}`;
-                
+
                 // 경로가 1이고 exercise 파라미터가 있는 경우에만 exercise_id를 추가
                 if (path === '1' && exercise) {
                     deepLink += `?exercise=${exercise}`;
                 }
             }
-            console.log("생성된 딥링크:", deepLink);  // 디버깅을 위한 로그 추가
 
-            // 사용자에게 확인 메시지 표시
+            console.log("생성된 딥링크:", deepLink); // 생성된 딥링크 출력
+
             if (confirm('앱을 실행하시겠습니까?')) {
-                // 딥링크로 앱 열기 시도
-                const newWindow = window.open(deepLink, '_blank');
+                // Android Intent URL 사용
+                // const intentURL = `${deepLink}#Intent;scheme=tangoplus;package=com.tangoplus.tangoq;end;`;
+                // window.location.href = intentURL;
 
-                // 일정 시간 후에 앱이 열리지 않으면 스토어로 이동
+                // 기본 딥링크 사용
+                window.location.href = deepLink;
+
                 setTimeout(() => {
                     if (!document.hidden) {
                         window.location.href = appStoreURL;
                     }
-                }, 4000); // 2초 후 확인
+                }, 5000); // 5초 후 Play 스토어로 이동
             }
         }
 
