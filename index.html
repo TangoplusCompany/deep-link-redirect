@@ -44,32 +44,29 @@
             console.log("전체 URL:", window.location.href); // 전체 URL 출력
             console.log("pathname:", window.location.pathname); // pathname 출력
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const exercise = urlParams.get('exercise');
-
-            // 경로 세그먼트 파싱 (쿼리 파라미터 방식으로 변경 가능)
-            const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
-            const path = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : '';
-
-            // 또는, 쿼리 파라미터 방식 사용 시:
-            // const path = urlParams.get('path') || '';
-
+            // GitHub Pages에서 "/deep-link-redirect/"와 같은 프로젝트 경로를 제외하고 실제 필요한 경로만 추출
+            const basePath = '/deep-link-redirect/';
+            const path = window.location.pathname.startsWith(basePath)
+                ? window.location.pathname.slice(basePath.length).split('/').filter(segment => segment.length > 0)[0]
+                : '';
+        
             console.log("가져온 경로 (path):", path); // path 변수 출력
 
+            const urlParams = new URLSearchParams(window.location.search);
+            const exercise = urlParams.get('exercise');
             let deepLink = `${appScheme}`;
 
             // path가 1, 2, 3, 4 중 하나인 경우에만 처리
             if (['1', '2', '3', '4'].includes(path)) {
                 deepLink += `/${path}`;
-
-                // 경로가 1이고 exercise 파라미터가 있는 경우에만 exercise_id를 추가
+    
+            // 경로가 1이고 exercise 파라미터가 있는 경우에만 exercise_id를 추가
                 if (path === '1' && exercise) {
-                    deepLink += `?exercise=${exercise}`;
+                deepLink += `?exercise=${exercise}`;
                 }
             }
 
             console.log("생성된 딥링크:", deepLink); // 생성된 딥링크 출력
-
             if (confirm('앱을 실행하시겠습니까?')) {
                 // Android Intent URL 사용
                 // const intentURL = `${deepLink}#Intent;scheme=tangoplus;package=com.tangoplus.tangoq;end;`;
