@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>TangoPlus App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        function openApp() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isAndroid = /android/i.test(userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+
+            const appScheme = "tangoplus://tangoq/1"; // 딥링크 경로 설정
+            const appStoreURL = "https://play.google.com/store/apps/details?id=com.tangoplus.tangoq"; // Play 스토어 URL로 변경
+
+            let startTime = Date.now();
+            // 앱 열기 시도
+            window.location.href = appScheme;
+
+            // 2초 후에 Play 스토어로 리디렉션
+            setTimeout(() => {
+                let endTime = Date.now();
+                // 사용자가 앱을 열었을 경우 페이지가 비활성화되므로 Play 스토어로 리디렉션되지 않습니다.
+                if (endTime - startTime < 1500) {
+                    window.location.href = appStoreURL;
+                }
+            }, 1500);
+        }
+
+        window.onload = openApp;
+    </script>
+</head>
+<body>
+    <p>앱을 여시겠습니까? <button onclick="openApp()">확인</button></p>
+</body>
+</html>
