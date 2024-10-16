@@ -8,12 +8,23 @@
         function openApp() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             const isAndroid = /android/i.test(userAgent);
-        
-            // 현재 URL의 경로를 가져옴 (예: /1, /2 등)
-            const path = window.location.pathname.substring(1); // 첫 슬래시 제거
+            
+            // Android가 아닌 경우 Play 스토어로 리디렉션 X
+            if (!isAndroid) {
+                alert("앱을 설치하지 않았거나 지원되지 않는 기기입니다.");
+                return;
+            }
+
+            // 현재 URL의 경로 가져오기
+            const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
+            
+            if (pathSegments.length === 0) {
+                alert("잘못된 링크입니다.");
+                return;
+            }
+
             // 딥링크 경로 동적 설정
-            const appScheme = `tangoplus://tangoq/${path}`;
-            // Play 스토어 URL (실제 패키지 이름으로 변경)
+            const appScheme = `tangoplus://tangoq/${pathSegments.join('/')}`;
             const appStoreURL = "https://play.google.com/store/apps/details?id=com.tangoplus.tangoq";
 
             let startTime = Date.now();
@@ -34,6 +45,7 @@
     </script>
 </head>
 <body>
-    <p>앱을 여시겠습니까? <button onclick="openApp()">확인</button></p>
+    <p>앱을 열 시도 중입니다...</p>
+    <p>앱을 열지 못했다면 <a href="#" onclick="openApp()">여기를 클릭</a>해주세요.</p>
 </body>
 </html>
