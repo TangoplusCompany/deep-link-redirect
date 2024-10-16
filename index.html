@@ -37,7 +37,7 @@
     </div>
 
     <script>
-        const appScheme = 'tangoplus://tangoq';
+        const appScheme = 'tangoplus';
         const appStoreURL = 'https://play.google.com/store/apps/details?id=com.tangoplus.tangoq';
 
         function handleDeepLink() {
@@ -59,7 +59,7 @@
             const urlParams = new URLSearchParams(queryPart);
             const exercise = urlParams.get('exercise');
         
-            let deepLink = `${appScheme}`;
+            let deepLink = `${appScheme}://tangoq`;
         
             // path가 1, 2, 3, 4 중 하나인 경우에만 처리
             if (['1', '2', '3', '4'].includes(path)) {
