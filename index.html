@@ -42,7 +42,7 @@
 
         function handleDeepLink() {
             const urlParams = new URLSearchParams(window.location.search);
-            const exerciseId = urlParams.get('exercise');
+            const exercise = urlParams.get('exercise');
             const path = window.location.pathname.split('/').pop();
             
             let deepLink = `${appScheme}`;
@@ -52,8 +52,8 @@
                 deepLink += `/${path}`;
                 
                 // 경로가 1이고 exercise 파라미터가 있는 경우에만 exercise_id를 추가
-                if (path === '1' && exerciseId) {
-                    deepLink += `?exercise=${exerciseId}`;
+                if (path === '1' && exercise) {
+                    deepLink += `?exercise=${exercise}`;
                 }
             }
 
