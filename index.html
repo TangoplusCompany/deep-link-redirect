@@ -45,14 +45,20 @@
             console.log("pathname:", window.location.pathname); // pathname 출력
             console.log("hash:", window.location.hash); // 해시 출력
         
-            // 해시 기반 라우팅 사용: # 뒤의 값을 가져옴
-            const hashPath = window.location.hash.split('/').filter(segment => segment.length > 0);
-            const path = hashPath.length > 0 ? hashPath[0] : ''; // 첫 번째 세그먼트 가져오기
+            // 해시에서 경로와 쿼리 파라미터 분리
+            const hash = window.location.hash;
+            let [pathPart, queryPart] = hash.includes('?') ? hash.split('?') : [hash, ''];
+        
+            // 해시 경로에서 "#" 및 "/"를 제거하고 경로만 추출
+            const pathSegments = pathPart.split('/').filter(segment => segment.length > 0);
+            const path = pathSegments.length > 0 ? pathSegments[0] : '';
         
             console.log("가져온 경로 (path):", path); // path 변수 출력
         
-            const urlParams = new URLSearchParams(window.location.search);
+            // 쿼리 파라미터 파싱
+            const urlParams = new URLSearchParams(queryPart);
             const exercise = urlParams.get('exercise');
+        
             let deepLink = `${appScheme}`;
         
             // path가 1, 2, 3, 4 중 하나인 경우에만 처리
