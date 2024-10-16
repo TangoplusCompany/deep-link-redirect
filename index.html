@@ -80,11 +80,15 @@
                 // 기본 딥링크 사용
                 window.location.href = deepLink;
 
+                // 3.5초 후 앱이 실행되지 않으면 확인 창 표시
                 setTimeout(() => {
                     if (!document.hidden) {
-                        window.location.href = appStoreURL;
+                        if (confirm('앱을 실행할 수 없습니다.')) {
+                            // 사용자가 확인을 누르면 Play 스토어로 이동
+                            window.location.href = appStoreURL;
+                        }
                     }
-                }, 5000); // 5초 후 Play 스토어로 이동
+                }, 4000); // 3.5초 후 실행
             }
         }
 
