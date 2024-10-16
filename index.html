@@ -2,18 +2,27 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>TangoQ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tango Q</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
-        #content {
-            display: none;
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         button {
+            margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
@@ -21,49 +30,38 @@
     </style>
 </head>
 <body>
-    <div id="content">
-        <p>앱을 열 수 없습니다. 앱 스토어로 이동하시겠습니까?</p>
-        <button id="openStoreBtn">확인</button>
+    <div class="container">
+        <h1>앱 실행하기</h1>
+        <p>아래 버튼을 클릭하여 앱을 실행하세요.</p>
+        <button onclick="handleDeepLink()">앱 실</button>
     </div>
-<p>앱을 열지 못했다면 <a href="#" id="retryLink">여기를 클릭</a>해주세요.</p>
+
     <script>
         const appScheme = 'tangoplus://tangoq';
         const appStoreURL = 'https://play.google.com/store/apps/details?id=com.tangoplus.tangoq';
 
-        function openApp() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const isAndroid = /android/i.test(userAgent);
+        function handleDeepLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const exerciseId = urlParams.get('exercise');
+            const path = window.location.pathname.split('/').pop();
             
-            if (!isAndroid) {
-                alert("앱을 설치하지 않았거나 지원되지 않는 기기입니다.");
-                return;
-            }
+            const deepLink = `${appScheme}/${path}?exercise_id=${exerciseId}`;
 
-            const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
-            if (pathSegments.length === 0) {
-                alert("잘못된 링크입니다.");
-                return;
-            }
-
-            const fullAppScheme = `${appScheme}/${pathSegments.join('/')}`;
-
-            if (confirm("앱을 여시겠습니까?")) {
-                let startTime = Date.now();
-                window.location.href = fullAppScheme;
+            
+            if (confirm('앱을 실행하시겠습니까?')) {
+                
+                window.location.href = deepLink;
 
                 setTimeout(() => {
-                    if (Date.now() - startTime < 1500) {
-                        document.getElementById('content').style.display = 'block';
+                    if (!document.hidden) {
+                        window.location.href = appStoreURL;
                     }
-                }, 1500);
+                }, 2000); // 2초 후 확인
             }
         }
 
-        document.getElementById('openStoreBtn').addEventListener('click', function() {
-            window.location.href = appStoreURL;
-        });
-
-        window.onload = openApp;
+        // 페이지 로드 시 자동으로 handleDeepLink 함수 실행
+        window.onload = handleDeepLink;
     </script>
 </body>
 </html>
