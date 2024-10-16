@@ -15,8 +15,8 @@
             margin-top: 20px;
         }
         .spinner {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #3498db; /* Blue */
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
             border-radius: 50%;
             width: 60px;
             height: 60px;
@@ -36,7 +36,18 @@
             cursor: pointer;
         }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
+</head>
+<body>
+    <div id="content">
+        <p>앱을 여시겠습니까?</p>
+        <button id="openAppBtn">확인</button>
+    </div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>앱을 실행하고 있습니다</p>
+    </div>
+    <p>앱을 열지 못했다면 <a href="#" id="retryLink">여기를 클릭</a>해주세요.</p>
+
     <script>
         function openApp() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -46,11 +57,13 @@
                 alert("앱을 설치하지 않았거나 지원되지 않는 기기입니다.");
                 return;
             }
+
             const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
             if (pathSegments.length === 0) {
                 alert("잘못된 링크입니다.");
                 return;
             }
+
             const appScheme = `tangoplus://tangoq/${pathSegments.join('/')}`;
             const appStoreURL = "https://play.google.com/store/apps/details?id=com.tangoplus.tangoq";
 
@@ -58,36 +71,51 @@
             document.getElementById('content').style.display = 'none';
 
             let startTime = Date.now();
-            // 앱 열기 시도
-            window.location.href = appScheme;
+            let hidden, visibilityChange;
+
+            if (typeof document.hidden !== "undefined") {
+                hidden = "hidden";
+                visibilityChange = "visibilitychange";
+            } else if (typeof document.msHidden !== "undefined") {
+                hidden = "msHidden";
+                visibilityChange = "msvisibilitychange";
+            } else if (typeof document.webkitHidden !== "undefined") {
+                hidden = "webkitHidden";
+                visibilityChange = "webkitvisibilitychange";
+            }
+
+            function handleVisibilityChange() {
+                if (!document[hidden]) {
+                    let endTime = Date.now();
+                    if (endTime - startTime < 3000) {
+                        window.location.href = appStoreURL;
+                    }
+                }
+            }
+
+            document.addEventListener(visibilityChange, handleVisibilityChange, false);
+
+            let iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = appScheme;
+            document.body.appendChild(iframe);
 
             setTimeout(() => {
-                let endTime = Date.now();
-               
-                if (endTime - startTime < 1000) {
-                    window.location.href = appStoreURL;
-                } else {
-                   
-                    document.getElementById('loader').style.display = 'none';
-                    document.getElementById('content').style.display = 'block';
-                }
-            }, 1500);
+                document.body.removeChild(iframe);
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            }, 3000);
         }
 
+        document.getElementById('openAppBtn').addEventListener('click', openApp);
+        document.getElementById('retryLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            openApp();
+        });
+
         window.onload = function() {
-            // 자동으로 시도하지 않고, 사용자 클릭을 기다림
+           
         };
     </script>
-</head>
-<body>
-    <div id="content">
-        <p>앱을 여시겠습니까?</p>
-        <button onclick="openApp()">확인</button>
-    </div>
-    <div id="loader">
-        <div class="spinner"></div>
-        <p>앱을 실행하고 있습니다</p>
-    </div>
-    <p>앱을 열지 못했다면 <a href="#" onclick="openApp()">여기를 클릭</a>해주세요.</p>
 </body>
 </html>
