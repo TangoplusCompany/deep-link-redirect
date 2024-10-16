@@ -8,16 +8,19 @@
         function openApp() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             const isAndroid = /android/i.test(userAgent);
-            const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-
-            const appScheme = "tangoplus://tangoq/1"; // 딥링크 경로 설정
-            const appStoreURL = "https://play.google.com/store/apps/details?id=com.tangoplus.tangoq"; // Play 스토어 URL로 변경
+        
+            // 현재 URL의 경로를 가져옴 (예: /1, /2 등)
+            const path = window.location.pathname.substring(1); // 첫 슬래시 제거
+            // 딥링크 경로 동적 설정
+            const appScheme = `tangoplus://tangoq/${path}`;
+            // Play 스토어 URL (실제 패키지 이름으로 변경)
+            const appStoreURL = "https://play.google.com/store/apps/details?id=com.tangoplus.tangoq";
 
             let startTime = Date.now();
             // 앱 열기 시도
             window.location.href = appScheme;
 
-            // 2초 후에 Play 스토어로 리디렉션
+            // 1.5초 후에 Play 스토어로 리디렉션
             setTimeout(() => {
                 let endTime = Date.now();
                 // 사용자가 앱을 열었을 경우 페이지가 비활성화되므로 Play 스토어로 리디렉션되지 않습니다.
