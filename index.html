@@ -33,13 +33,13 @@
     <div class="container">
         <h1>앱 실행하기</h1>
         <p>아래 버튼을 클릭하여 앱을 실행하세요.</p>
-        <button onclick="handleDeepLink()">앱 실행</button>
+        <button onclick="handleDeepLink(true)">앱 실행</button>
     </div>
     <script>
         const appScheme = 'tangoplus';
         const appStoreURL = 'https://play.google.com/store/apps/details?id=com.tangoplus.tangoq';
         
-        function handleDeepLink() {
+        function handleDeepLink(isButtonClick = false) {
             console.log("전체 URL:", window.location.href);
             console.log("pathname:", window.location.pathname);
             console.log("hash:", window.location.hash);
@@ -66,7 +66,7 @@
         
             console.log("생성된 딥링크:", deepLink);
             
-            if (confirm('앱을 실행하시겠습니까?')) {
+            function launchApp() {
                 window.location.href = deepLink;
                 
                 setTimeout(() => {
@@ -75,12 +75,22 @@
                             window.location.href = appStoreURL;
                         }
                     }
-                }, 2500);
+                }, 3000);
+            }
+
+            // 버튼 클릭인 경우에만 confirm 창을 표시
+            if (isButtonClick) {
+                if (confirm('앱을 실행하시겠습니까?')) {
+                    launchApp();
+                }
+            } else {
+                // 페이지 로드 시에는 바로 앱 실행 시도
+                launchApp();
             }
         }
         
-        // 페이지 로드 시에도 handleDeepLink 실행
-        window.onload = handleDeepLink;
+        // 페이지 로드 시에는 isButtonClick = false로 실행
+        window.onload = () => handleDeepLink(false);
     </script>
 </body>
 </html>
