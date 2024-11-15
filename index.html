@@ -75,7 +75,7 @@
                             window.location.href = appStoreURL;
                         }
                     }
-                }, 3000);
+                }, 2000);
             }
 
             // 버튼 클릭인 경우에만 confirm 창을 표시
@@ -89,8 +89,12 @@
             }
         }
         
-        // // 페이지 로드 시에는 isButtonClick = false로 실행
-        // window.onload = () => handleDeepLink(false);
+        window.addEventListener('load', () => {
+            // URL에 해시가 있는 경우에만 자동 실행
+            if (window.location.hash) {
+                handleDeepLink(false);
+            }
+        });
     </script>
 </body>
 </html>
