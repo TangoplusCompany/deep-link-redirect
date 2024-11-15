@@ -40,61 +40,78 @@
         const appStoreURL = 'https://play.google.com/store/apps/details?id=com.tangoplus.tangoq';
         
         function handleDeepLink(isButtonClick = false) {
-            console.log("전체 URL:", window.location.href);
-            console.log("pathname:", window.location.pathname);
-            console.log("hash:", window.location.hash);
-        
+            console.log("handleDeepLink 함수 실행됨");
+            
             const hash = window.location.hash;
             let [pathPart, queryPart] = hash.includes('?') ? hash.split('?') : [hash, ''];
-        
+            
             const pathSegments = pathPart.replace('#/', '').split('/').filter(segment => segment.length > 0);
             const path = pathSegments.length > 0 ? pathSegments[0] : '';
-        
-            console.log("가져온 경로 (path):", path);
-        
+            
             const urlParams = new URLSearchParams(queryPart);
             const exercise = urlParams.get('exercise');
-        
+            
             let deepLink = `${appScheme}://tangoq`;
-        
+            
             if (['1', '2', '3', '4'].includes(path)) {
                 deepLink += `/${path}`;
                 if (path === '1' && exercise) {
                     deepLink += `?exercise=${exercise}`;
                 }
             }
-        
+            
             console.log("생성된 딥링크:", deepLink);
             
             function launchApp() {
-                window.location.href = deepLink;
+                // hidden 속성 변경 감지를 위한 리스너
+                let visibilityChanged = false;
+                const visibilityHandler = () => {
+                    visibilityChanged = true;
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                };
+                document.addEventListener('visibilitychange', visibilityHandler);
                 
-                setTimeout(() => {
-                    if (!document.hidden) {
-                        if (confirm('앱을 실행할 수 없습니다.')) {
-                            window.location.href = appStoreURL;
-                        }
+                // 인텐트 방식 URL (안드로이드 전용)
+                const intentUrl = `intent://${deepLink.replace(appScheme + '://', '')}#Intent;scheme=${appScheme};package=com.tangoplus.tangoq;end;`;
+                
+                // 모바일 여부 확인
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    if (/Android/i.test(navigator.userAgent)) {
+                        // 안드로이드의 경우 인텐트 방식 사용
+                        window.location.href = intentUrl;
                     }
-                }, 2000);
+                    
+                    // 앱 미설치 확인용 타이머
+                    setTimeout(() => {
+                        if (!visibilityChanged && !document.hidden) {
+                            if (confirm('앱이 설치되어 있지 않습니다. 스토어로 이동하시겠습니까?')) {
+                                window.location.href = appStoreURL;
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    // 데스크톱의 경우 기존 방식 유지
+                    window.location.href = deepLink;
+                }
             }
 
-            // 버튼 클릭인 경우에만 confirm 창을 표시
             if (isButtonClick) {
                 if (confirm('앱을 실행하시겠습니까?')) {
                     launchApp();
                 }
             } else {
-                // 페이지 로드 시에는 바로 앱 실행 시도
                 launchApp();
             }
         }
         
-        window.addEventListener('load', () => {
-            // URL에 해시가 있는 경우에만 자동 실행
-            if (window.location.hash) {
+        // 페이지 로드 시 자동 실행
+        if (/Android/i.test(navigator.userAgent)) {
+            document.addEventListener('DOMContentLoaded', () => {
                 handleDeepLink(false);
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>
